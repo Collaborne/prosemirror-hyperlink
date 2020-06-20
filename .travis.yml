@@ -11,6 +11,7 @@ before_install:
 - if [ -d node_modules ] && [ x$(cat node_modules/.last-node-version 2>/dev/null) != x$(node -e 'console.log(process.version)') ]; then npm rebuild --update-binary && node -e 'console.log(process.version)' > node_modules/.last-node-version; fi
 script:
 - npm run lint
+- npm run build
 - npm test
 deploy:
   provider: npm
