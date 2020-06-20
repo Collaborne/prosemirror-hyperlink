@@ -13,7 +13,10 @@ export class HyperlinkMarkView<S extends Schema> implements NodeView {
 			.filter(name => node.attrs[name])
 			.forEach(name => this.dom.setAttribute(name, node.attrs[name]));
 
-		this.dom.addEventListener('click', () => {
+		this.dom.addEventListener('click', (e: Event) => {
+			// Prevent browser from following links
+			e.preventDefault();
+
 			const pos = view.posAtDOM(this.dom, 0);
 			showEditToolbar({
 				pos,
