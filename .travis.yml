@@ -1,0 +1,23 @@
+os: linux
+dist: bionic
+group: beta
+language: node_js
+node_js:
+- lts/erbium
+cache:
+  directories:
+  - node_modules
+before_install:
+- if [ -d node_modules ] && [ x$(cat node_modules/.last-node-version 2>/dev/null) != x$(node -e 'console.log(process.version)') ]; then npm rebuild --update-binary && node -e 'console.log(process.version)' > node_modules/.last-node-version; fi
+script:
+- npm run lint
+- npm test
+deploy:
+  provider: npm
+  email: npm@collaborne.com
+  api_key:
+    secure: "RLYSCO1qXp7ozMZ6c+ZfwseUm74r//2/sR7+AV72OuHRfvMW2NOdRSJUFPaNRWBj7IDZSCRFwRDHlDODfcwDPu3FkmRmLLffL9zhU0zEhpsMA7oUI68Do3gZCb1jeo5zTI5Gu6zR6uyXRBBSKoBOZuMpnnYucLcw/R2wvg7FocZ+ZFVPhpM/LqtsvJekcAf2ENE5ANguy6QXafEm0ERYyUO33EO4jFC0JtfTPMEA5wfOM8OKbUknLhEzysEEn+H2tiqrelHPauFkVqRA72ig5YzVFvo7WgSkTYSJEcPtbWninR1q+M5Bz1giW7Kk882fHxSlj+MhsGmOV1+dIsKtoVUlVBMCC0BK95Rigd11OESOTe0DL/Zy0jteISKfKEHOxucWyzr48I5Sr3uM4MZGUYXx9xqoNcGmSDQ3whEqRX2if5m/ek8QwkASdju71FgdgBw144vqsOJWnWs01w0Br8vxT6OILChzCz66CSiIBWbXxdertLW5uzcNSBwhX8FVzwCErEe0iNgeHqpshz+xI3LNw3Bik2r+a/uJTWCVWHW5bSeydtGsGGTvjfAVdhn2ZbFbofsfQ/zWCV6Yx41aRbBzyei1KIma5TXqCjR0oyg31TAG4FxXOjJJ8vUQ0FiVZh0NPTXc3tWXJC8i3FJwqKDXxmL2U9WQPKWaEJvzAWI="
+  on:
+    tags: true
+    condition: $(node -e 'console.log("v" + require("./package.json").version)') = ${TRAVIS_TAG}
+  skip_cleanup: true

@@ -1,0 +1,48 @@
+{
+  "name": "prosemirror-hyperlink",
+  "version": "0.0.1",
+  "description": "Prosemirror plugin to add hyperlink support",
+  "author": "prosemirror-hyperlink",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "prosemirror-inputrules": "^1.1.2",
+    "prosemirror-model": "^1.10.0",
+    "prosemirror-state": "^1.3.3",
+    "prosemirror-view": "^1.14.13"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@types/node": "13.11.1",
+    "@types/prosemirror-inputrules": "^1.0.2",
+    "@types/prosemirror-state": "^1.2.4",
+    "@types/prosemirror-view": "^1.11.4",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
+    "eslint": "^6.1.0",
+    "eslint-plugin-import": "^2.21.2",
+    "husky": "^1.0.0",
+    "lint-staged": "^8.0.0",
+    "tslib": "^1.11.0",
+    "typescript": "~3.8.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint",
+      "git add"
+    ]
+  }
+}
