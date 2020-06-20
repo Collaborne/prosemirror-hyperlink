@@ -1,6 +1,6 @@
 {
   "name": "prosemirror-hyperlink",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Prosemirror plugin to add hyperlink support",
   "author": "prosemirror-hyperlink",
   "license": "Apache-2.0",
