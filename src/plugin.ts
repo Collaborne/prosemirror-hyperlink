@@ -3,20 +3,24 @@ import { Plugin } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 
 import { reducer } from './reducer';
-import { pluginKey, PluginState } from './state';
+import { EditState, InsertState, pluginKey, PluginState } from './state';
 import { HyperlinkMarkView } from './view';
 
 export interface ToolbarOptions {
 	visible: boolean;
 	top?: number;
 	left?: number;
+	/**
+	 * Dom node of the link that triggered the toolbar
+	 */
+	dom?: Node;
 	href?: string;
 	text?: string;
 }
 type ConfigureToolbar = (options: ToolbarOptions) => void;
 
 export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
-	constructor(linkMarkType: MarkType, configureToolbar: ConfigureToolbar) {
+	constructor(private linkMarkType: MarkType, private configureToolbar: ConfigureToolbar) {
 		super({
 			key: pluginKey,
 			state: {
@@ -37,36 +41,10 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 					/* eslint-disable no-case-declarations */
 					const { toolbar: toolbarState } = this.getState(view.state);
 					switch (toolbarState.status) {
-						case 'edit':
-							const { bottom, left } = view.coordsAtPos(toolbarState.pos);
-							const currentNode = view.state.doc.nodeAt(toolbarState.pos);
-							if (!currentNode) {
-								throw new Error(`Node can't be found at position ${toolbarState.pos}`);
-							}
-							const linkMark = currentNode.marks.find(mark => mark.type === linkMarkType);
-							if (!linkMark) {
-								throw new Error(`Node found at position ${toolbarState.pos} isn't marked as link`);
-							}
-
-							return configureToolbar({
-								href: linkMark.attrs.href,
-								left,
-								text: currentNode.text!,
-								top: bottom,
-								visible: true,
-							});
 						case 'insert':
-							const text = view.state.doc.textBetween(toolbarState.from, toolbarState.to);
-
-							const coords = view.coordsAtPos(toolbarState.from);
-
-							return configureToolbar({
-								href: undefined,
-								left: coords.left,
-								text,
-								top: coords.bottom,
-								visible: true,
-							});
+							return this.createInsertToolbarOptions(view, toolbarState);
+						case 'edit':
+							return this.createEditToolbarOptions(view, toolbarState);
 						case 'closed':
 							return configureToolbar({
 								visible: false,
@@ -77,6 +55,42 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 					/* eslint-enable no-case-declarations */
 				},
 			}),
+		});
+	}
+
+	private createEditToolbarOptions<S extends Schema>(view: EditorView<S>, state: EditState) {
+		const { bottom, left } = view.coordsAtPos(state.pos);
+		const dom = view.domAtPos(state.pos).node;
+		const currentNode = view.state.doc.nodeAt(state.pos);
+		if (!currentNode) {
+			throw new Error(`Node can't be found at position ${state.pos}`);
+		}
+		const linkMark = currentNode.marks.find(mark => mark.type === this.linkMarkType);
+		if (!linkMark) {
+			throw new Error(`Node found at position ${state.pos} isn't marked as link`);
+		}
+	
+		return this.configureToolbar({
+			dom,
+			href: linkMark.attrs.href,
+			left,
+			text: currentNode.text!,
+			top: bottom,
+			visible: true,
+		});
+	}
+
+	private createInsertToolbarOptions<S extends Schema>(view: EditorView<S>, state: InsertState) {
+		const insertDom = view.domAtPos(state.from).node;
+		const text = view.state.doc.textBetween(state.from, state.to);
+		const coords = view.coordsAtPos(state.from);
+
+		return this.configureToolbar({
+			dom: insertDom,
+			left: coords.left,
+			text,
+			top: coords.bottom,
+			visible: true,
 		});
 	}
 }
