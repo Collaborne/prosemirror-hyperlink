@@ -10,7 +10,8 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore",
-    "test": "echo \"No tests yet\""
+    "test": "echo \"No tests yet\"",
+    "prepublish": "npm run lint && npm run build"
   },
   "dependencies": {
     "prosemirror-inputrules": "^1.1.2",
