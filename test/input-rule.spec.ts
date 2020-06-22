@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import 'mocha';
 
 import { inputRules } from 'prosemirror-inputrules';
+import { Node as ProsemirrorNode } from 'prosemirror-model';
 import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
 import { doc, p } from 'prosemirror-test-builder';
@@ -26,9 +27,11 @@ export function insertText(view: EditorView, text: string, from?: number) {
 }
 
 describe('input-rule', () => {
-	const place = document.body.appendChild(document.createElement('div'));
+	let node: ProsemirrorNode | undefined | null;
+	let nextNode: ProsemirrorNode | undefined | null;
 
-	it('should convert "www.example.com" to hyperlink', () => {
+	before(() => {
+		const place = document.body.appendChild(document.createElement('div'));
 		const rule = linkRule(schema.marks.link);
 		const editorView = new EditorView(place, {
 			state: EditorState.create({
@@ -44,13 +47,20 @@ describe('input-rule', () => {
 
 		insertText(editorView, `${URL} `, 1);
 
-		const node = editorView.state.doc.nodeAt(1)!;
-		expect(node.text).equals(URL, 'Keeps texts');
-		
-		const linkMark = node.marks.find(mark => mark.type === schema.marks.link)!;
-		expect(linkMark.attrs.href).equals(URL, 'Adds marker for link');
+		node = editorView.state.doc.nodeAt(1);
+		nextNode = editorView.state.doc.nodeAt(1 + node!.text!.length);
+	});
 
-		const nextNode = editorView.state.doc.nodeAt(1 + node.text!.length)!;
-		expect(nextNode.text).equals(' ', 'Appends space after link');
+	it('preserves hyperlink text', () => {
+		expect(node!.text).equals(URL);
+	});
+
+	it('adds marker for link', () => {
+		const linkMark = node!.marks.find(mark => mark.type === schema.marks.link)!;
+		expect(linkMark.attrs.href).equals(URL, 'Adds marker for link');
+	});
+
+	it('appends space after link', () => {
+		expect(nextNode!.text).equals(' ');
 	});
 });
