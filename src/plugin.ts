@@ -8,8 +8,6 @@ import { HyperlinkMarkView } from './view';
 
 export interface ToolbarOptions {
 	visible: boolean;
-	top?: number;
-	left?: number;
 	/**
 	 * Dom node of the link that triggered the toolbar
 	 */
@@ -59,7 +57,6 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 	}
 
 	private createEditToolbarOptions<S extends Schema>(view: EditorView<S>, state: EditState) {
-		const { bottom, left } = view.coordsAtPos(state.pos);
 		const dom = view.domAtPos(state.pos).node;
 		const currentNode = view.state.doc.nodeAt(state.pos);
 		if (!currentNode) {
@@ -73,9 +70,7 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 		return this.configureToolbar({
 			dom,
 			href: linkMark.attrs.href,
-			left,
 			text: currentNode.text!,
-			top: bottom,
 			visible: true,
 		});
 	}
@@ -83,13 +78,10 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 	private createInsertToolbarOptions<S extends Schema>(view: EditorView<S>, state: InsertState) {
 		const insertDom = view.domAtPos(state.from).node;
 		const text = view.state.doc.textBetween(state.from, state.to);
-		const coords = view.coordsAtPos(state.from);
 
 		return this.configureToolbar({
 			dom: insertDom,
-			left: coords.left,
 			text,
-			top: coords.bottom,
 			visible: true,
 		});
 	}
