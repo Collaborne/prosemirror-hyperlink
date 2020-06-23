@@ -64,7 +64,7 @@ export class HyperlinkPlugin<S extends Schema> extends Plugin<PluginState, S> {
 		}
 		const linkMark = currentNode.marks.find(mark => mark.type === this.linkMarkType);
 		if (!linkMark) {
-			throw new Error(`Node found at position ${state.pos} isn't marked as link`);
+			throw new Error(`Node found at position ${state.pos} isn't marked as link. Node: ${JSON.stringify(currentNode)}`);
 		}
 	
 		return this.configureToolbar({
