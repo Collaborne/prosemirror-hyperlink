@@ -3,9 +3,8 @@ import 'mocha';
 
 import { inputRules } from 'prosemirror-inputrules';
 import { Node as ProsemirrorNode } from 'prosemirror-model';
-import { schema } from 'prosemirror-schema-basic';
 import { EditorState } from 'prosemirror-state';
-import { doc, p } from 'prosemirror-test-builder';
+import { doc, p, schema } from 'prosemirror-test-builder';
 import { EditorView } from 'prosemirror-view';
 
 import { linkRule } from '../src';
